@@ -103,11 +103,11 @@ export default function EditSpeciesDialog({ userId, userSpecies }: { userId: str
       .update([
         {
           author: userId,
-          common_name: input.common_name,
-          description: input.description,
+          common_name: input.common_name ?? null,
+          description: input.description ?? null,
           kingdom: input.kingdom,
-          total_population: input.total_population,
-          image: input.image,
+          total_population: input.total_population ?? null,
+          image: input.image ?? null,
           endangered: false,
         },
       ])
