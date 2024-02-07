@@ -76,6 +76,7 @@ const defaultValues: Partial<FormData> = {
   total_population: null,
   image: null,
   description: null,
+  endangered: false,
 };
 
 export default function EditSpeciesDialog({ userId, userSpecies }: { userId: string; userSpecies: Species[] }) {

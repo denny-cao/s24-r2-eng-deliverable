@@ -52,6 +52,7 @@ const speciesSchema = z.object({
     .nullable()
     // Transform empty string or only whitespace input to null before form submission, and trim whitespace otherwise
     .transform((val) => (!val || val.trim() === "" ? null : val.trim())),
+  endangered: z.boolean().nullable(),
 });
 
 type FormData = z.infer<typeof speciesSchema>;
@@ -73,6 +74,7 @@ const defaultValues: Partial<FormData> = {
   total_population: null,
   image: null,
   description: null,
+  endangered: null,
 };
 
 export default function DeleteSpeciesDialog({ userId, userSpecies }: { userId: string; userSpecies: Species[] }) {
