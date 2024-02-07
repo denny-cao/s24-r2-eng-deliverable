@@ -100,7 +100,7 @@ export default function EditSpeciesDialog({ userId, userSpecies }: { userId: str
     const supabase = createBrowserSupabaseClient();
     const { error } = await supabase
       .from("species")
-      .update(
+      .update([
         {
           author: userId,
           common_name: input.common_name ?? null,
@@ -110,7 +110,7 @@ export default function EditSpeciesDialog({ userId, userSpecies }: { userId: str
           image: input.image ?? null,
           endangered: false,
         },
-      )
+      ])
       .eq("scientific_name", input.scientific_name);
 
     // Catch and report errors from Supabase and exit the onSubmit function with an early 'return' if an error occurred.
