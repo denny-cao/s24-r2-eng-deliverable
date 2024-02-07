@@ -104,7 +104,7 @@ export default function AddSpeciesDialog({ userId }: { userId: string }) {
         total_population: input.total_population,
         image: input.image,
         endangered: input.endangered === "True",
-      },
+      }
     ]);
 
     // Catch and report errors from Supabase and exit the onSubmit function with an early 'return' if an error occurred.

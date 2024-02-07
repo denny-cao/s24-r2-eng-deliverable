@@ -37,8 +37,8 @@ export default async function SpeciesList() {
         <TypographyH2>Species List</TypographyH2>
         <div className="flex flex-wrap items-center gap-4">
           <AddSpeciesDialog userId={sessionId} />
-          <EditSpeciesDialog userId={sessionId} userSpecies={species} />
-          <DeleteSpeciesDialog userId={sessionId} userSpecies={species} />
+          <EditSpeciesDialog userId={sessionId} userSpecies={userSpecies ?? []} />
+          <DeleteSpeciesDialog userSpecies={userSpecies ?? []} />
         </div>
       </div>
       <Separator className="my-4" />

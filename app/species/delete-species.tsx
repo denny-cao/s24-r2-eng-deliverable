@@ -77,7 +77,7 @@ const defaultValues: Partial<FormData> = {
   endangered: null,
 };
 
-export default function DeleteSpeciesDialog({ userId, userSpecies }: { userId: string; userSpecies: Species[] }) {
+export default function DeleteSpeciesDialog({ userSpecies }: { userSpecies: Species[] }) {
   const router = useRouter();
 
   // Control open/closed state of the dialog

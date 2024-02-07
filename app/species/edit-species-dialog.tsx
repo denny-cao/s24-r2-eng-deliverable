@@ -29,6 +29,8 @@ import { z } from "zod";
 // Define kingdom enum for use in Zod schema and displaying dropdown options in the form
 const kingdoms = z.enum(["Animalia", "Plantae", "Fungi", "Protista", "Archaea", "Bacteria"]);
 
+const bools = z.enum(["True", "False"]);
+
 // Use Zod to define the shape + requirements of a Species entry; used in form validation
 const speciesSchema = z.object({
   scientific_name: z
@@ -54,7 +56,7 @@ const speciesSchema = z.object({
     .nullable()
     // Transform empty string or only whitespace input to null before form submission, and trim whitespace otherwise
     .transform((val) => (!val || val.trim() === "" ? null : val.trim())),
-  endangered: z.boolean().nullable(),
+  endangered: bools,
 });
 
 type FormData = z.infer<typeof speciesSchema>;
@@ -71,12 +73,12 @@ type Species = Database["public"]["Tables"]["species"]["Row"];
 
 const defaultValues: Partial<FormData> = {
   scientific_name: "",
-  common_name: null,
+  common_name: "",
   kingdom: undefined,
-  total_population: null,
-  image: null,
-  description: null,
-  endangered: false,
+  total_population: undefined,
+  image: "",
+  description: "",
+  endangered: undefined,
 };
 
 export default function EditSpeciesDialog({ userId, userSpecies }: { userId: string; userSpecies: Species[] }) {
@@ -98,20 +100,19 @@ export default function EditSpeciesDialog({ userId, userSpecies }: { userId: str
   const onSubmit = async (input: FormData) => {
     // The `input` prop contains data that has already been processed by zod. We can now use it in a supabase query
     const supabase = createBrowserSupabaseClient();
-    const { error } = await supabase
-      .from("species")
-      .update([
-        {
-          author: userId,
-          common_name: input.common_name ?? null,
-          description: input.description ?? null,
-          kingdom: input.kingdom,
-          total_population: input.total_population ?? null,
-          image: input.image ?? null,
-          endangered: false,
-        },
-      ])
-      .eq("scientific_name", input.scientific_name);
+    const { error } = await supabase.from("species").update(
+      {
+        author: userId,
+        common_name: input.common_name,
+        description: input.description,
+        kingdom: input.kingdom,
+        scientific_name: input.scientific_name,
+        total_population: input.total_population,
+        image: input.image,
+        endangered: input.endangered === "True",
+      }
+    ).eq("scientific_name", input.scientific_name)
+    ;
 
     // Catch and report errors from Supabase and exit the onSubmit function with an early 'return' if an error occurred.
     if (error) {
@@ -171,13 +172,11 @@ export default function EditSpeciesDialog({ userId, userSpecies }: { userId: str
                         if (selectedSpecies) {
                           // Update form fields with selected animal information
                           form.setValue("scientific_name", selectedSpecies.scientific_name);
-                          form.setValue("common_name", selectedSpecies.common_name ?? null);
-                          // Print the kingdom to the console
-                          console.log(selectedSpecies.kingdom);
+                          form.setValue("common_name", selectedSpecies.common_name);
                           form.setValue("kingdom", selectedSpecies.kingdom);
-                          form.setValue("total_population", selectedSpecies.total_population ?? null);
-                          form.setValue("image", selectedSpecies.image ?? null);
-                          form.setValue("description", selectedSpecies.description ?? null);
+                          form.setValue("total_population", selectedSpecies.total_population);
+                          form.setValue("image", selectedSpecies.image);
+                          form.setValue("description", selectedSpecies.description);
                         }
 
                         field.onChange(value);
@@ -191,7 +190,7 @@ export default function EditSpeciesDialog({ userId, userSpecies }: { userId: str
                       </FormControl>
                       <SelectContent>
                         <SelectGroup>
-                          {userSpecies?.map((userSpecies) => (
+                          {userSpecies.map((userSpecies) => (
                             <SelectItem key={userSpecies.id} value={userSpecies.scientific_name}>
                               {userSpecies.scientific_name}
                             </SelectItem>
@@ -268,6 +267,32 @@ export default function EditSpeciesDialog({ userId, userSpecies }: { userId: str
                     </FormItem>
                   );
                 }}
+              />
+              <FormField
+                control={form.control}
+                name="endangered"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Endangered</FormLabel>
+                    <Select onValueChange={(value) => field.onChange(value)} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectGroup>
+                          {bools.options.map((bool, index) => (
+                            <SelectItem key={index} value={bool}>
+                              {bool}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
               <FormField
                 control={form.control}
